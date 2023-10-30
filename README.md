@@ -1,2 +1,2 @@
-# deploy-the-qa-app-into-production-lp-author
-Repository for liveProject: Deploy the Q&A App into Production
+# build-and-deploy-the-chatbot-lp-author
+Repository for liveProject: Build and Deploy the Chatbot
