@@ -19,7 +19,13 @@ from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
 load_dotenv()
 
 persist_directory = "chroma_db"
-embedding = OpenAIEmbeddings(openai_api_key=os.environ['OPENAI_API_KEY'])
+
+if 'OPENAI_API_KEY' in st.secrets:
+    openai_api_key = st.secrets["OPENAI_API_KEY"]
+else:
+    openai_api_key = os.environ['OPENAI_API_KEY']
+
+embedding = OpenAIEmbeddings(openai_api_key=openai_api_key)
 chroma_client = chromadb.PersistentClient(
     path="chroma_db",
     settings=Settings(),
