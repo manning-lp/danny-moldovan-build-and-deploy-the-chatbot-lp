@@ -1,35 +1,40 @@
 import streamlit as st
-import requests
 
-st.title("Chat with LangChain & ChromaDB")
+import requests 
 
-# Input for user's question
-question = st.text_input("Ask a question:")
+# App title
+st.set_page_config(page_title="LangChain Chatbot")
 
-if st.button("Submit"):
-    # API endpoint URL (replace with your actual URL)
-    api_url = "http://localhost:8000/chat"
 
-    # Create payload with question and chat history (if applicable)
-    data = {"input": {"question": question}}
-    
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+# Store LLM generated responses
+if "messages" not in st.session_state.keys():
+    st.session_state.messages = [{"role": "assistant", "content": "How may I help you?"}]
 
-    # Send POST request to LangServe API
-    response = requests.post(api_url, json=data)
+# Display chat messages
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
 
-    # Handle response
-    if response.status_code == 200:
-        answer = response.json()["result"]
-        st.session_state.messages.append({"role": "user", "content": question})
-        st.session_state.messages.append({"role": "assistant", "content": answer})
+# Function for generating LLM response
+def generate_response(prompt_input):
+    inputs = {"input": {"question": prompt_input}}
+    response = requests.post("http://localhost:8000/invoke", json=inputs)
+    answer = response.json()["output"]["answer"]
+    supporting_doc_url = response.json()['output']['source_documents'][0]['page_content'].split("'source':")[1].replace("'", "").replace("}", "").strip()
 
-        # Display chat history
-        for message in st.session_state.messages:
-            if message["role"] == "user":
-                st.write(f"User: {message['content']}")
-            elif message["role"] == "assistant":
-                st.write(f"Bot:expand_more {message['content']}")
-    else:
-        st.error(f"Error: {response.status_code}")
+    return answer + " supporting document: " + supporting_doc_url
+
+# User-provided prompt
+if prompt := st.chat_input():
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.write(prompt)
+
+# Generate a new response if last message is not from assistant
+if st.session_state.messages[-1]["role"] != "assistant":
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            response = generate_response(prompt) 
+            st.write(response) 
+    message = {"role": "assistant", "content": response}
+    st.session_state.messages.append(message)
