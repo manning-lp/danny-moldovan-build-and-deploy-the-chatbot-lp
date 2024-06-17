@@ -1,6 +1,20 @@
 import streamlit as st
 
+from fastapi import FastAPI
+import uvicorn
+import threading
+
 import requests 
+import server as danny_server
+
+BACKEND = "localhost"
+
+app = danny_server.app
+def start_server():
+    uvicorn.run(app, host=BACKEND, port=8000)
+
+# Start the FastAPI server in a separate thread
+threading.Thread(target=start_server).start()
 
 # App title
 st.set_page_config(page_title="LangChain Chatbot")
