@@ -2,6 +2,7 @@ __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
+import streamlit as st
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain_community.chat_models import ChatOpenAI
@@ -20,10 +21,11 @@ load_dotenv()
 
 persist_directory = "chroma_db"
 
-if 'OPENAI_API_KEY' in st.secrets:
-    openai_api_key = st.secrets["OPENAI_API_KEY"]
-else:
+if 'OPENAI_API_KEY' in os.environ:
     openai_api_key = os.environ['OPENAI_API_KEY']
+else:
+    openai_api_key = st.secrets["OPENAI_API_KEY"]
+    
 
 embedding = OpenAIEmbeddings(openai_api_key=openai_api_key)
 chroma_client = chromadb.PersistentClient(
