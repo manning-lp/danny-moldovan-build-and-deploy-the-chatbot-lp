@@ -1,13 +1,17 @@
 import streamlit as st
+import os
 
+os.environ['OPENAI_API_KEY_SECRET']=  st.secrets["OPENAI_API_KEY"]
+
+
+import requests 
+import server as danny_server
 from fastapi import FastAPI
 import uvicorn
 import threading
 
-import requests 
-import server as danny_server
-
 BACKEND = "localhost"
+
 
 app = danny_server.app
 def start_server():
