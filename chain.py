@@ -24,6 +24,7 @@ persist_directory = "chroma_db"
 if 'OPENAI_API_KEY' in os.environ:
     openai_api_key = os.environ['OPENAI_API_KEY']
 else:
+    st.error(st.secrets.keys(), icon="🚨")
     openai_api_key = st.secrets["OPENAI_API_KEY"]
     
 
